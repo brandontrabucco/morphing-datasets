@@ -40,30 +40,20 @@ def get_designs(num_designs,
 
     # check the target domain and import the appropriate agent
     if domain == "ant":
-        from morphing_agents.mujoco.ant.env import MorphingAntEnv as Env
+        from morphing_agents.mujoco import MorphingAntEnv as MorphingEnv
         from morphing_agents.mujoco.ant.designs import DEFAULT_DESIGN
         from morphing_agents.mujoco.ant.designs import sample_uniformly
-        from morphing_agents.mujoco.ant.elements import LEG
-        from morphing_agents.mujoco.ant.elements import LEG_UPPER_BOUND
-        from morphing_agents.mujoco.ant.elements import LEG_LOWER_BOUND
+        from morphing_agents.mujoco.ant.designs import sample_centered
     elif domain == "dog":
-        from morphing_agents.mujoco.dog.env import MorphingDogEnv as Env
+        from morphing_agents.mujoco import MorphingDogEnv as MorphingEnv
         from morphing_agents.mujoco.dog.designs import DEFAULT_DESIGN
         from morphing_agents.mujoco.dog.designs import sample_uniformly
-        from morphing_agents.mujoco.dog.elements import LEG
-        from morphing_agents.mujoco.dog.elements import LEG_UPPER_BOUND
-        from morphing_agents.mujoco.dog.elements import LEG_LOWER_BOUND
+        from morphing_agents.mujoco.dog.designs import sample_centered
     else:
-        from morphing_agents.mujoco.dkitty.env import MorphingDKittyEnv as Env
+        from morphing_agents.mujoco import MorphingDKittyEnv as MorphingEnv
         from morphing_agents.mujoco.dkitty.designs import DEFAULT_DESIGN
         from morphing_agents.mujoco.dkitty.designs import sample_uniformly
-        from morphing_agents.mujoco.dkitty.elements import LEG
-        from morphing_agents.mujoco.dkitty.elements import LEG_UPPER_BOUND
-        from morphing_agents.mujoco.dkitty.elements import LEG_LOWER_BOUND
-
-    ub = np.array(list(LEG_UPPER_BOUND))
-    lb = np.array(list(LEG_LOWER_BOUND))
-    scale = (ub - lb) / 2
+        from morphing_agents.mujoco.dkitty.designs import sample_centered
 
     designs = []
     while len(designs) < num_designs:
@@ -75,11 +65,8 @@ def get_designs(num_designs,
 
             # sample designs centered at a gold standard
             elif method == 'centered':
-                d = [LEG(*np.clip(
-                    np.array(leg) +
-                    np.random.normal(0, scale) * noise_std,
-                    lb,
-                    ub)) for leg in DEFAULT_DESIGN]
+                d = sample_centered(noise_std=noise_std,
+                                    center=DEFAULT_DESIGN)
 
             # otherwise use the default design
             else:
@@ -87,7 +74,7 @@ def get_designs(num_designs,
 
             # check if that designed raised an error when built
             # some designs are invalid and checking them is non-trivial
-            Env(fixed_design=d)
+            MorphingEnv(fixed_design=d)
             designs.append(d)
 
         except:
@@ -235,7 +222,7 @@ if __name__ == "__main__":
                               domain=args.domain,
                               method=args.method,
                               verbose=True,
-                              noise_std=args.noise_std)  # 0.125
+                              noise_std=args.noise_std)
 
     design_chunks = split(design_list,
                           args.num_parallel)

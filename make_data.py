@@ -138,7 +138,17 @@ def start_gpu_process(process_id,
 
         # make a ppo agent
         agent = PPO2(
-            MlpPolicy, env,
+            MlpPolicy,
+            env,
+            n_steps=max_episode_steps,
+            ent_coef=0.001,
+            learning_rate=0.0003,
+            vf_coef=0.5,
+            max_grad_norm=0.5,
+            lam=0.95,
+            nminibatches=10,
+            noptepochs=10,
+            cliprange=0.2,
             verbose=1,
             full_tensorboard_log=False,
             tensorboard_log=os.path.join(
@@ -200,7 +210,7 @@ if __name__ == "__main__":
                         default=4)
     parser.add_argument('--max-episode-steps',
                         type=int,
-                        default=1000)
+                        default=500)
     parser.add_argument('--total-timesteps',
                         type=int,
                         default=1000000)
@@ -209,7 +219,7 @@ if __name__ == "__main__":
                         default=0.125)
     parser.add_argument('--method',
                         type=str,
-                        default='uniform',
+                        default='centered',
                         choices=['uniform', 'centered'])
     parser.add_argument('--domain',
                         type=str,

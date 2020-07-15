@@ -77,7 +77,7 @@ def get_designs(num_designs,
             elif method == 'centered':
                 d = [LEG(*np.clip(
                     np.array(leg) +
-                    np.random.normal(0, scale / noise_std),
+                    np.random.normal(0, scale) * noise_std,
                     lb,
                     ub)) for leg in DEFAULT_DESIGN]
 
@@ -217,6 +217,9 @@ if __name__ == "__main__":
     parser.add_argument('--total-timesteps',
                         type=int,
                         default=1000000)
+    parser.add_argument('--noise-std',
+                        type=float,
+                        default=0.125)
     parser.add_argument('--method',
                         type=str,
                         default='uniform',
@@ -232,7 +235,7 @@ if __name__ == "__main__":
                               domain=args.domain,
                               method=args.method,
                               verbose=True,
-                              noise_std=0.125)
+                              noise_std=args.noise_std)  # 0.125
 
     design_chunks = split(design_list,
                           args.num_parallel)

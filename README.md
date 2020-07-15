@@ -26,6 +26,7 @@ python morphing-datasets/make_data.py \
   --n-envs N_ENVS \
   --max-episode-steps MAX_EPISODE_STEPS \
   --total-timesteps TOTAL_TIMESTEPS \
+  --noise-std NOISE_STD \
   --method {uniform,centered} \
   --domain {ant,dog,dkitty}
 ```

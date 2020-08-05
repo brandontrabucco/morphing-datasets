@@ -130,7 +130,7 @@ if __name__ == "__main__":
                         default='./data')
     parser.add_argument('--designs-file',
                         type=str,
-                        default='designs.pkl')
+                        default='designs.npy')
     parser.add_argument('--num-parallel',
                         type=int,
                         default=1)
@@ -152,8 +152,32 @@ if __name__ == "__main__":
                         choices=['ant', 'dog', 'dkitty'])
     args = parser.parse_args()
 
-    with open(args.designs_file, 'rb') as f:
-        design_list = pkl.load(f)
+    # dynamically load the right leg elements for the agent domain
+    if args.domain == "ant":
+        from morphing_agents.mujoco.ant.elements import LEG
+        from morphing_agents.mujoco.ant.elements import LEG_UPPER_BOUND
+        from morphing_agents.mujoco.ant.elements import LEG_LOWER_BOUND
+    elif args.domain == "dog":
+        from morphing_agents.mujoco.dog.elements import LEG
+        from morphing_agents.mujoco.dog.elements import LEG_UPPER_BOUND
+        from morphing_agents.mujoco.dog.elements import LEG_LOWER_BOUND
+    elif args.domain == "dkitty":
+        from morphing_agents.mujoco.dkitty.elements import LEG
+        from morphing_agents.mujoco.dkitty.elements import LEG_UPPER_BOUND
+        from morphing_agents.mujoco.dkitty.elements import LEG_LOWER_BOUND
+
+    # infer the leg elements from a numpy tensor
+    design_list = []
+    for single_design in np.load(args.designs_file):
+        elements = []
+        element_size = len(LEG_UPPER_BOUND)
+        while single_design.size > 0:
+            elements.append(LEG(*np.clip(
+                single_design[:element_size],
+                np.array(LEG_LOWER_BOUND),
+                np.array(LEG_UPPER_BOUND))))
+            single_design = single_design[element_size:]
+        design_list.append(elements)
 
     design_chunks = split(design_list,
                           args.num_parallel)

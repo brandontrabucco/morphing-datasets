@@ -42,7 +42,7 @@ six==1.15.0
 stable-baselines[mpi]==2.10.0
 tensorboard==1.15.0
 tensorflow-estimator==1.15.1
-tensorflow-gpu==1.15.2
+tensorflow-gpu==1.15.0
 termcolor==1.1.0
 transforms3d==0.3.1
 Werkzeug==1.0.1

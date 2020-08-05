@@ -134,7 +134,7 @@ if __name__ == "__main__":
                         default=500)
     parser.add_argument('--total-timesteps',
                         type=int,
-                        default=1000000)
+                        default=10000000)
     parser.add_argument('--max-save-steps',
                         type=int,
                         default=10000)
